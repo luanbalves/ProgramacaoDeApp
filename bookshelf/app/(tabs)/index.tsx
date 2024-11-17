@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  Button,
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
@@ -14,22 +13,24 @@ import { ThemedView } from '@/components/ThemedView';
 import firestore from '@react-native-firebase/firestore';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Book, BookStatus, getIconByStatus } from '@/constants/Book';
+import { Book, getIconByStatus } from '@/constants/Book';
 import { SearchBar } from 'react-native-elements';
-import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
 export default function HomeScreen() {
   const [books, setBooks] = useState<Book[]>([]);
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState('');
+
   const colorScheme = useColorScheme();
   const listBackgroundColor = colorScheme === 'dark' ? '#333' : '#777';
-  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     const subscriber = firestore()
       .collection('books')
       .onSnapshot((querySnapshot) => {
-        const booksData: Book[] = [];  
+        const booksData: Book[] = [];
 
         querySnapshot.forEach((documentSnapshot) => {
           const data = documentSnapshot.data();
@@ -42,15 +43,33 @@ export default function HomeScreen() {
             rating: data.rating,
             key: documentSnapshot.id,
           };
-          booksData.push(book);  
+          booksData.push(book);
         });
 
-        setBooks(booksData);  
+        setBooks(booksData);
+        setFilteredBooks(booksData);
         setLoading(false);
       });
 
-    return () => subscriber();  
+    return () => subscriber();
   }, []);
+
+  const filterBooks = (query: string) => {
+    if (!query) {
+      setFilteredBooks(books);
+    } else {
+      const filtered = books.filter(
+        (book) =>
+          book.name.toLowerCase().includes(query.toLowerCase()) ||
+          book.author.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredBooks(filtered);
+    }
+  };
+
+  useEffect(() => {
+    filterBooks(searchText);
+  }, [searchText, books]);
 
   const handleCancel = (key: string) => {
     Alert.alert(
@@ -90,20 +109,23 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <TouchableOpacity onPress={() => router.push('/home/addBook')} style={styles.addBook}>
+      <TouchableOpacity
+        onPress={() => router.push('/home/addBook')}
+        style={styles.addBook}
+      >
         <MaterialCommunityIcons name='book-plus' size={32} color='white' />
       </TouchableOpacity>
 
       <SearchBar
         placeholder='Pesquisar'
         value={searchText}
-        onChangeText={setSearchText}
+        onChangeText={(text) => setSearchText(text)}
         containerStyle={styles.searchBarContainer}
         inputContainerStyle={styles.searchBarInput}
         round
       />
       <FlatList
-        data={books}
+        data={filteredBooks}
         keyExtractor={(item) => item.key ?? ''}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -122,7 +144,6 @@ export default function HomeScreen() {
               <View style={styles.textContainer}>
                 <ThemedText>{item.name}</ThemedText>
                 <ThemedText>{item.author}</ThemedText>
-                {/* <StarRatingDisplay rating={item.rating}/> */}
               </View>
               <TouchableOpacity onPress={() => handleCancel(item.key ?? '')}>
                 <MaterialCommunityIcons
@@ -169,6 +190,6 @@ const styles = StyleSheet.create({
   addBook: {
     alignSelf: 'flex-end',
     marginRight: 10,
-    marginBottom: 10
-  }
+    marginBottom: 10,
+  },
 });
