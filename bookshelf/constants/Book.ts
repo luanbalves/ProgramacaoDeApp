@@ -3,5 +3,5 @@ export interface Book {
     author: string,
     summary: string,
     status: string,
-    rating: number
+    rating: number,
 }

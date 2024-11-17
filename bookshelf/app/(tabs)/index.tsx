@@ -1,53 +1,69 @@
-import { StyleSheet, Platform, Button } from 'react-native';
+import {
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+  FlatList,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import firestore from '@react-native-firebase/firestore';
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Book } from '@/constants/Book';
+import { SearchBar } from 'react-native-elements';
 
 export default function HomeScreen() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+  const colorScheme = useColorScheme()
+  const listBackgroundColor = colorScheme === 'dark' ? '#333' : '#fff'
+  const [searchText, setSearchText] = useState('');
+
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('books')
+      .onSnapshot((querySnapshot) => {
+        const books: Book[] = [];
+
+        querySnapshot.forEach((documentSnapshot) => {
+          books.push({
+            ...documentSnapshot.data(),
+            key: documentSnapshot.id,
+          });
+        });
+        setBooks(books);
+        setLoading(false);
+      });
+  });
+
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
   return (
     <ThemedView style={styles.container}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type='title'>Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type='subtitle'>Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{' '}
-          <ThemedText type='defaultSemiBold'>app/(tabs)/index.tsx</ThemedText>{' '}
-          to see changes. Press{' '}
-          <ThemedText type='defaultSemiBold'>
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type='subtitle'>Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type='subtitle'>Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type='defaultSemiBold'>npm run reset-project</ThemedText>{' '}
-          to get a fresh <ThemedText type='defaultSemiBold'>app</ThemedText>{' '}
-          directory. This will move the current{' '}
-          <ThemedText type='defaultSemiBold'>app</ThemedText> to{' '}
-          <ThemedText type='defaultSemiBold'>app-example</ThemedText>.
-        </ThemedText>
-        <Button title='Navegar' onPress={() => router.push('/home/addBook')}/>
-      </ThemedView>
+      <Button title='+' onPress={() => router.push('/home/addBook')} />
+
+      <SearchBar
+          placeholder='Pesquisar'
+          value={searchText}
+          onChangeText={setSearchText}
+          containerStyle={styles.searchBarContainer}
+          inputContainerStyle={styles.searchBarInput}
+          round
+        />
+      <FlatList
+        data={books}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={[styles.listContainer, {backgroundColor: listBackgroundColor}]}>
+            <ThemedText>{item.name}</ThemedText>
+            <ThemedText>{item.author}</ThemedText>
+          </TouchableOpacity>
+        )}
+      />
     </ThemedView>
   );
 }
@@ -56,15 +72,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 60,
-    alignItems: 'center',
   },
-  titleContainer: {
-    flexDirection: 'row',
+  listContainer: {
     alignItems: 'center',
-    gap: 8,
+    borderRadius: 12,
+    padding: 7,
+    marginVertical: 5
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  searchBarContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  searchBarInput: {
+    backgroundColor: '#333',
   },
 });
