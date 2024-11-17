@@ -113,7 +113,7 @@ export default function HomeScreen() {
         onPress={() => router.push('/home/addBook')}
         style={styles.addBook}
       >
-        <MaterialCommunityIcons name='book-plus' size={32} color='white' />
+        <MaterialCommunityIcons name='book-plus' size={32} color= {colorScheme === 'dark' ? '#fff' : '#000'} />
       </TouchableOpacity>
 
       <SearchBar
