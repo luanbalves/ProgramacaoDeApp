@@ -1,7 +1,7 @@
 import TextInputDefault from '@/components/TextInputDefault';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Book } from '@/constants/Book';
+import { Book, BookStatus } from '@/constants/Book';
 import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { Alert, Button, StyleSheet, TextInput } from 'react-native';
@@ -14,7 +14,7 @@ export default function addBook() {
   const [author, setAuthor] = useState('');
   const [rating, setRating] = useState(0);
   const [summary, setSummary] = useState('');
-  const [status, setStatus] = useState('On shelf');
+  const [status, setStatus] = useState(BookStatus.OnShelf);
 
   const addBook = async () => {
     if (!name || !author || !rating || !summary || !status) {
@@ -75,13 +75,13 @@ export default function addBook() {
       <ThemedText style={styles.text}>Status</ThemedText>
       <Picker
         selectedValue={status}
-        onValueChange={(itemValue) => setStatus(itemValue)}
+        onValueChange={(itemValue) => setStatus(itemValue as BookStatus)}
         style={styles.picker}
       >
-        <Picker.Item label='Na estante' value='On shelf' />
-        <Picker.Item label='Em progresso' value='In Progress' />
-        <Picker.Item label='Lido' value='Completed' />
-        <Picker.Item label='Lista de desejo' value='Wishlist' />
+        <Picker.Item label='Na estante' value={BookStatus.OnShelf}/>
+        <Picker.Item label='Em progresso' value={BookStatus.InProgress} />
+        <Picker.Item label='Lido' value={BookStatus.Completed} />
+        <Picker.Item label='Lista de desejo' value={BookStatus.Wishlist} />
       </Picker>
 
       <ThemedText style={styles.text}>Avaliação</ThemedText>
