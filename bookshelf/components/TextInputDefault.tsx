@@ -43,7 +43,7 @@ const TextInputDefault: React.FC<TextInputDefaultProps> = ({
       </ThemedText>
       <ThemedView style={styles.container}>
         <TextInput
-          style={[styles.textInput, style]} 
+          style={[styles.textInput, style, value ? styles.textInputWithClear : {}]} 
           onChangeText={onChangeText}
           value={value}
           placeholder={placeholder}
@@ -81,6 +81,9 @@ const styles = StyleSheet.create({
     right: 10,
     padding: 10,
   },
+  textInputWithClear: {
+    paddingRight: 40,
+  }
 });
 
 export default TextInputDefault;

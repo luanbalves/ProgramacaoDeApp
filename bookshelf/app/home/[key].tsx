@@ -98,7 +98,7 @@ export default function BookScreen() {
   };
 
   if (loading) {
-    return <ActivityIndicator />;
+    return <ActivityIndicator />; 
   }
 
   if (!book) {
@@ -110,28 +110,26 @@ export default function BookScreen() {
       <ThemedText style={styles.title}>Detalhes do Livro</ThemedText>
 
       {!isEditing ? (
-        <View>
-          <ThemedText style={styles.text}>
-            Nome do livro: {book.name}
-          </ThemedText>
-          <ThemedText style={styles.text}>Autor: {book.author}</ThemedText>
-          <View style={{ flexDirection: 'row' }}>
-            <ThemedText style={styles.text}>Status:</ThemedText>
+        <View style={styles.card}>
+          <ThemedText style={styles.bookName}>{book.name}</ThemedText>
+          <ThemedText style={styles.author}>Autor: {book.author}</ThemedText>
+
+          <View style={styles.row}>
+            <ThemedText style={styles.statusLabel}>Status: </ThemedText>
             <MaterialCommunityIcons
               name={getIconByStatus(book.status)}
               size={24}
               color='white'
             />
           </View>
-          <ThemedText style={styles.text}>Resumo: {book.summary}</ThemedText>
-          <StarRatingDisplay
-            rating={book.rating}
-            style={{ alignSelf: 'center', marginBottom: 7 }}
-          />
+
+          <ThemedText style={styles.summary}>{book.summary}</ThemedText>
+
+          <StarRatingDisplay rating={book.rating} style={styles.rating} />
         </View>
       ) : (
         <View>
-          <ThemedText style={styles.text}>Nome:</ThemedText>
+          <ThemedText style={styles.textOnEdit}>Nome:</ThemedText>
           <TextInput
             value={name}
             onChangeText={setName}
@@ -139,7 +137,7 @@ export default function BookScreen() {
             style={styles.input}
           />
 
-          <ThemedText style={styles.text}>Autor:</ThemedText>
+          <ThemedText style={styles.textOnEdit}>Autor:</ThemedText>
 
           <TextInput
             value={author}
@@ -148,7 +146,7 @@ export default function BookScreen() {
             style={styles.input}
           />
 
-          <ThemedText style={styles.text}>Resumo:</ThemedText>
+          <ThemedText style={styles.textOnEdit}>Resumo:</ThemedText>
 
           <TextInput
             value={summary}
@@ -158,7 +156,7 @@ export default function BookScreen() {
             multiline
           />
 
-          <ThemedText style={styles.text}>Status:</ThemedText>
+          <ThemedText style={styles.textOnEdit}>Status:</ThemedText>
 
           <Picker
             selectedValue={status}
@@ -193,15 +191,55 @@ export default function BookScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: 20,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
-    color: 'white',
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
+  card: {
+    padding: 15,
+    backgroundColor: '#222',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
     marginBottom: 20,
   },
-  text: {
+  bookName: {
+    fontSize: 26,
+    color: 'white',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  author: {
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 15,
+  },
+  statusLabel: {
+    fontSize: 18,
+    color: 'white',
+    marginRight: 5,
+  },
+  summary: {
+    fontSize: 16,
+    color: 'white',
+    marginBottom: 15,
+  },
+  rating: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  textOnEdit: {
     fontSize: 16,
     color: 'white',
     marginBottom: 10,
