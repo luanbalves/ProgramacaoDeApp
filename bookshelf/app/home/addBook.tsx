@@ -27,7 +27,7 @@ export default function addBook() {
       author,
       summary,
       status,
-      rating
+      rating,
     }
 
     try {

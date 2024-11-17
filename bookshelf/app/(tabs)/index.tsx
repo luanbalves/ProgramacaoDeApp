@@ -29,18 +29,28 @@ export default function HomeScreen() {
     const subscriber = firestore()
       .collection('books')
       .onSnapshot((querySnapshot) => {
-        const books: Book[] = [];
+        const booksData: Book[] = [];  
 
         querySnapshot.forEach((documentSnapshot) => {
-          books.push({
-            ...documentSnapshot.data(),
+          const data = documentSnapshot.data();
+
+          const book: Book = {
+            name: data.name,
+            author: data.author,
+            summary: data.summary,
+            status: data.status,
+            rating: data.rating,
             key: documentSnapshot.id,
-          });
+          };
+          booksData.push(book);  
         });
-        setBooks(books);
+
+        setBooks(booksData);  
         setLoading(false);
       });
-  });
+
+    return () => subscriber();  
+  }, []);
 
   const handleCancel = (key: string) => {
     Alert.alert(
@@ -94,12 +104,14 @@ export default function HomeScreen() {
       />
       <FlatList
         data={books}
+        keyExtractor={(item) => item.key ?? ''}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[
               styles.listContainer,
               { backgroundColor: listBackgroundColor },
             ]}
+            onPress={() => router.push(`/home/${item.key}`)}
           >
             <View style={styles.contentContainer}>
               <MaterialCommunityIcons
@@ -112,7 +124,7 @@ export default function HomeScreen() {
                 <ThemedText>{item.author}</ThemedText>
                 {/* <StarRatingDisplay rating={item.rating}/> */}
               </View>
-              <TouchableOpacity onPress={() => handleCancel(item.key)}>
+              <TouchableOpacity onPress={() => handleCancel(item.key ?? '')}>
                 <MaterialCommunityIcons
                   name='trash-can'
                   size={24}

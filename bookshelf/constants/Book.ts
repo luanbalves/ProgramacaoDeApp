@@ -4,7 +4,7 @@ export interface Book {
   summary: string;
   status: BookStatus;
   rating: number;
-  key: string;
+  key?: string;
 }
 
 export enum BookStatus {

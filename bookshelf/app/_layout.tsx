@@ -33,6 +33,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Home' }} />
         <Stack.Screen name="+not-found" />
         <Stack.Screen name='home/addBook' options={{ headerTitle: 'Adicionar Livro'}} />
+        <Stack.Screen name='home/[key]' options={{ headerTitle: 'Detalhes do Livro'}} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
